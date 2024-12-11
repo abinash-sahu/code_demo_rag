@@ -9,3 +9,7 @@ tiktoken
 langchain-huggingface
 streamlit
 langchain-openai
+huggingface_hub
+transformers
+bitsandbytes
+accelerate

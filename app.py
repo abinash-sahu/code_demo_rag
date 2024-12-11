@@ -5,6 +5,7 @@ from langchain.chains import RetrievalQA
 #from langchain.chat_models import ChatOpenAI
 from langchain_openai import ChatOpenAI
 from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
+from langchain_huggingface import HuggingFaceEndpoint
 from dotenv import load_dotenv
 import os
 
@@ -50,11 +51,6 @@ if query:
         st.write("Loading FAISS index...")
         vectorstore = load_faiss_index(INDEX_FOLDER)
 
-        # # Retrieve relevant documents
-        # st.write("Searching for relevant documents...")
-        # retriever = vectorstore.as_retriever()
-        # relevant_docs = retriever.get_relevant_documents(query)
-
         # Retrieve relevant documents using similarity search
         st.write("Searching for relevant documents...")
         relevant_docs = vectorstore.similarity_search(query)
@@ -66,14 +62,18 @@ if query:
 
             # Step 3: Generate Response using OpenAI Model
             #llm = ChatOpenAI(model_name="gpt-4o", openai_api_key=openai_api_key)
-            llm = ChatOpenAI(
-                    model="gpt-4o",
-                    temperature=0,
-                    max_tokens=None,
-                    timeout=None,
-                    max_retries=2,
-                    openai_api_key=openai_api_key
-            )
+            # llm = ChatOpenAI(
+            #         model="gpt-4o",
+            #         temperature=0,
+            #         max_tokens=None,
+            #         timeout=None,
+            #         max_retries=2,
+            #         openai_api_key=openai_api_key
+            # )
+
+            repo_id="mistralai/Mistral-7B-Instruct-v0.2"
+            llm=HuggingFaceEndpoint(repo_id=repo_id,max_length=128,temperature=0.7,token=hf_token)
+
             knowledge_context = "\n".join([doc.page_content for doc in relevant_docs])
             response = llm.invoke(f"Based on the following documents, answer the query: {query}\n\n{knowledge_context}")
 
